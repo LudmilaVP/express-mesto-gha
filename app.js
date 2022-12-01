@@ -19,13 +19,13 @@ app.use((req, res, next) => {
 app.use(routes);
 
 mongoose.connect(DATABASE_URL)
-.then(() => {
-  console.log(`Connected to database on ${DATABASE_URL}`);
-})
-.catch((err) => {
-  console.log('Error on database connection');
-  console.error(err);
-});
+  .then(() => {
+    console.log(`Connected to database on ${DATABASE_URL}`);
+  })
+  .catch((err) => {
+    console.log('Error on database connection');
+    console.error(err);
+  });
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

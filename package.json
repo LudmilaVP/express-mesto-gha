@@ -4,7 +4,9 @@
   "description": "Место - cайт, на котором пользователь может редактировать интерактивную форму, вводить любое имя и профессию, менять аватар, добавлять картинки на сервер, удалять, лайкать.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
