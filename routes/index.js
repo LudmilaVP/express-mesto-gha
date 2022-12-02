@@ -5,8 +5,8 @@ const cardsRouter = require('./cards');
 router.use('/users', usersRouter);
 router.use('/cards', cardsRouter);
 
-router.use((req, res) => {
-  res.status(404).send('Сервер не найден');
+router.all('*', (req, res, next) => {
+  next(new Error('Неверный адрес запроса'));
 });
 
 module.exports = router;
