@@ -32,7 +32,7 @@ const likeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Неверный формат переданных данных' });
       } else if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+        res.status(404).send({ message: 'Такой карточки не существует' });
       } else {
         res.status(500).send({ message: 'Не получилось обработать запрос' });
       }
@@ -49,7 +49,7 @@ const deleteCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Неверный формат переданных данных' });
       } else if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+        res.status(404).send({ message: 'Карточка с таким номером не найдена' });
       } else {
         res.status(500).send({ message: 'Не получилось обработать запрос' });
       }
@@ -67,7 +67,7 @@ const dislikeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Неверный формат переданных данных' });
       } else if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+        res.status(404).send({ message: 'Такой карточки не существует' });
       } else {
         res.status(500).send({ message: 'Не получилось обработать запрос' });
       }

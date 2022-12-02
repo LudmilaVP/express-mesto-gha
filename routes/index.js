@@ -9,8 +9,4 @@ router.use((req, res) => {
   res.status(404).send('Сервер не найден');
 });
 
-router.all('*', (req, res) => {
-  res.status(404).send('Сервер не найден');
-});
-
 module.exports = router;
