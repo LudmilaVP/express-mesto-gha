@@ -7,7 +7,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 const DATABASE_URL = 'mongodb://127.0.0.1:27017/mestodb';
 
-app.use(bodyParser.json());
+app.use(express.json());
 app.use((req, res, next) => {
   req.user = {
     _id: '63889ef57b5d54bd8ee13d91',
@@ -26,9 +26,7 @@ mongoose.connect(DATABASE_URL)
     console.log('Error on database connection');
     console.error(err);
   });
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Ничего не найдено. Проверьте путь и метод запроса' });
-});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
