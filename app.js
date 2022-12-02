@@ -18,10 +18,6 @@ app.use((req, res, next) => {
 
 app.use(routes);
 
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Ничего не найдено. Проверьте путь и метод запроса' });
-});
-
 mongoose.connect(DATABASE_URL)
   .then(() => {
     console.log(`Connected to database on ${DATABASE_URL}`);
@@ -30,6 +26,10 @@ mongoose.connect(DATABASE_URL)
     console.log('Error on database connection');
     console.error(err);
   });
+
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Ничего не найдено. Проверьте путь и метод запроса' });
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
