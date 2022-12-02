@@ -1,10 +1,9 @@
 const Cards = require('../models/card');
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/errors');
 
 const getCards = (req, res) => {
   Cards.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'На сервере произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Не получилось обработать запрос' }));
 };
 
 const createCard = (req, res) => {
@@ -14,27 +13,10 @@ const createCard = (req, res) => {
   return Cards.create({ name, link, owner })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Неверный формат переданных данных' });
       } else {
-        res.status(SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-};
-
-const deleteCard = (req, res) => {
-  const { cardId } = req.params;
-
-  return Cards.findByIdAndRemove(cardId)
-    .orFail(() => new Error('NotFound'))
-    .then((card) => res.status(200).send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
-      } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(500).send({ message: 'Не получилось обработать запрос' });
       }
     });
 };
@@ -47,12 +29,29 @@ const likeCard = (req, res) => {
   ).orFail(() => new Error('NotFound'))
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки лайка' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный формат переданных данных' });
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+        res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       } else {
-        res.status(SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(500).send({ message: 'Не получилось обработать запрос' });
+      }
+    });
+};
+
+const deleteCard = (req, res) => {
+  const { cardId } = req.params;
+
+  return Cards.findByIdAndRemove(cardId)
+    .orFail(() => new Error('NotFound'))
+    .then((card) => res.status(200).send(card))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный формат переданных данных' });
+      } else if (err.message === 'NotFound') {
+        res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Не получилось обработать запрос' });
       }
     });
 };
@@ -65,12 +64,12 @@ const dislikeCard = (req, res) => {
   ).orFail(() => new Error('NotFound'))
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для снятия лайка' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный формат переданных данных' });
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
+        res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       } else {
-        res.status(SERVER_ERROR).send({ message: 'На сервере произошла ошибка' });
+        res.status(500).send({ message: 'Не получилось обработать запрос' });
       }
     });
 };
@@ -78,7 +77,7 @@ const dislikeCard = (req, res) => {
 module.exports = {
   getCards,
   createCard,
-  deleteCard,
   likeCard,
+  deleteCard,
   dislikeCard,
 };
