@@ -1,5 +1,5 @@
 const Cards = require('../models/card');
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/errors');
+const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/constants');
 
 const getCards = (req, res) => {
   Cards.find({}).populate('owners', 'likes')
