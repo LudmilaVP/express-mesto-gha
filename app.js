@@ -27,10 +27,6 @@ mongoose.connect(DATABASE_URL)
     console.error(err);
   });
 
-app.use('*', (req, res, next) => {
-  next(new Error('Ничего не найдено. Проверьте путь и метод запроса'));
-});
-
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
