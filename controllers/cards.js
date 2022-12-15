@@ -52,7 +52,7 @@ const deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (card.owner.toString() === req.user._id) {
-        Cards.findByIdAndRemove(cardId).then(() => res.status(200).send(card));
+        Cards.findByIdAndRemove(cardId).then(() => res.send(card));
       } else {
         throw new ForbiddenError('Нельзя удалять чужую карточку');
       }
