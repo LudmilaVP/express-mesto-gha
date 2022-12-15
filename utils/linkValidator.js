@@ -1,4 +1,4 @@
-const { BadRequest } = require('../errors/BadRequest');
+const BadRequest = require('../errors/BadRequest');
 const { linkPattern } = require('./linkPattern');
 
 module.exports = (url) => {
