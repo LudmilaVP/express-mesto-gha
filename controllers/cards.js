@@ -1,13 +1,15 @@
 const Cards = require('../models/card');
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../errors/constants');
+const BadRequest = require('../errors/BadRequest');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Cards.find({}).populate('owners', 'likes')
     .then((cards) => res.send(cards))
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'Не получилось обработать запрос' }));
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -15,63 +17,65 @@ const createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Неверный формат переданных данных' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Не получилось обработать запрос' });
+        throw new BadRequest('Переданы некорректные данные карточки');
       }
-    });
+    })
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  ).orFail(() => new Error('NotFound'))
+  ).orFail(() => {
+    throw new NotFoundError('Не найдена карточка с указанным id');
+  })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Неверный формат переданных данных' });
-      } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Такой карточки не существует' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Не получилось обработать запрос' });
+        next(new BadRequest('Переданы некорректные данные карточки'));
       }
+      if (err.message === 'NotFound') {
+        next(new NotFoundError('Не найдена карточка с указанным id'));
+      }
+      next(err);
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   return Cards.findByIdAndRemove(cardId)
-    .orFail(() => new Error('NotFound'))
-    .then((card) => res.send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Неверный формат переданных данных' });
-      } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Карточка с таким номером не найдена' });
+    .orFail(() => {
+      throw new NotFoundError('Не найдена карточка с указанным id');
+    })
+    .then((card) => {
+      if (card.owner.toString() === req.user._id) {
+        Cards.findByIdAndRemove(cardId).then(() => res.status(200).send(card));
       } else {
-        res.status(SERVER_ERROR).send({ message: 'Не получилось обработать запрос' });
+        throw new ForbiddenError('Нельзя удалять чужую карточку');
       }
-    });
+    })
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Cards.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  ).orFail(() => new Error('NotFound'))
+  ).orFail(() => {
+    throw new NotFoundError('Не найдена карточка с указанным id');
+  })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Неверный формат переданных данных' });
+        next(new BadRequest('Переданы некорректные данные карточки'));
       } else if (err.message === 'NotFound') {
-        res.status(NOT_FOUND).send({ message: 'Такой карточки не существует' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Не получилось обработать запрос' });
+        next(new NotFoundError('Не найдена карточка с указанным id'));
       }
+      next(err);
     });
 };
 
