@@ -19,8 +19,8 @@ app.post('/signin', loginValidator, login);
 app.post('/signup', createUserValidator, createUser);
 
 app.use(auth);
-app.use(routes);
 app.use(errors());
+app.use(routes);
 app.use(handleError);
 
 mongoose.connect(DATABASE_URL)
