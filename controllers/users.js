@@ -32,12 +32,9 @@ const getUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Переданы некорректные данные пользователя'));
+        return next(new BadRequest('Переданы некорректные данные пользователя'));
       }
-      if (err.message === 'NotFound') {
-        next(new NotFoundError('Не найден пользователь с указанным id'));
-      }
-      next(err);
+      return next(err);
     });
 };
 
@@ -57,12 +54,13 @@ const createUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные пользователя');
+        next(new BadRequest('Переданы некорректные данные пользователя'));
       } else if (err.code === 11000) {
         throw new ConflictError('Пользователь с таким email уже существует');
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const updateUser = (req, res, next) => {
@@ -77,10 +75,11 @@ const updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные пользователя');
+        next(new BadRequest('Переданы некорректные данные пользователя'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const updateAvatar = (req, res, next) => {
@@ -96,10 +95,11 @@ const updateAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные пользователя');
+        next(new BadRequest('Переданы некорректные данные пользователя'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -110,10 +110,11 @@ const getCurrentUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные');
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {
