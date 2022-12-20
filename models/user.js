@@ -36,8 +36,14 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 }, {
-  versionKey: '',
+  versionKey: false,
 });
+
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
 
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
