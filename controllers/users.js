@@ -54,12 +54,12 @@ const createUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные пользователя'));
-      } else if (err.code === 11000) {
-        throw new ConflictError('Пользователь с таким email уже существует');
-      } else {
-        next(err);
+        return next(new BadRequest('Переданы некорректные данные пользователя'));
       }
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким email уже существует'));
+      }
+      return next(err);
     });
 };
 
